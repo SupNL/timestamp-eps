@@ -5,7 +5,17 @@
 #include <fstream>
 #include <algorithm>
 #include <conio.h>
+#include <string>
 using namespace std;
+
+string getKeyName(UINT code){
+    switch(code){
+        case VK_SPACE:
+            return "ESPACO";
+        case MOD_ALT:
+            return "ALT";
+    }
+}
 
 string replaceSpace(string text){
     replace(text.begin(), text.end(), ' ', '_');
@@ -20,9 +30,9 @@ void aguardarInicio(){
 void mensagemRegistro(){
     system("cls");
     cout << "Iniciou!\n";
-    cout << "Aperte CTRL + SHIFT + S para registrar o tempo\n";
-    cout << "Aperte CTRL + SHIFT + A caso tenha ocorrido um erro no seu episodio\n";
-    cout << "Aperte CTRL + SHIFT + ESPACO para finalizar\n\n";
+    cout << "Aperte CTRL + ALT + S para registrar o tempo\n";
+    cout << "Aperte CTRL + ALT + A caso tenha ocorrido um erro no seu episodio\n";
+    cout << "Aperte CTRL + ALT + ESPACO para finalizar\n\n";
 }
 
 int converterParaSegundos(string tempo){
@@ -76,8 +86,8 @@ void inicializarRegistro(ofstream* arquivo){
     inicio = time(NULL);
 
     if(
-        RegisterHotKey(NULL, 2, MOD_SHIFT | MOD_CONTROL | 0x4000, 0x53) && /// tecla S
-        RegisterHotKey(NULL, 3, MOD_SHIFT | MOD_CONTROL | 0x4000, 0x41) /// tecla A
+        RegisterHotKey(NULL, 2, MOD_ALT | MOD_CONTROL | 0x4000, 0x53) && /// tecla S
+        RegisterHotKey(NULL, 3, MOD_ALT | MOD_CONTROL | 0x4000, 0x41) /// tecla A
     ){
         mensagemRegistro();
         while (GetMessage(&msg, NULL, 0, 0) != 0 && msg.wParam != 1){
@@ -93,7 +103,7 @@ void inicializarRegistro(ofstream* arquivo){
                 offset = converterParaSegundos(tempo);
                 system("cls");
                 cout << "Pronto para retomar a partir de " << tempo << '\n';
-                cout << "Aperte CTRL + SHIFT + ESPACO quando retomar o anime\n";
+                cout << "Aperte CTRL + ALT + ESPACO quando retomar o anime\n";
                 aguardarInicio();
                 inicio = time(NULL);
                 mensagemRegistro();
@@ -112,7 +122,7 @@ void prepararRegistro(){
     string nomeAnime, seasonAnime, epAnime;
     string nomeArquivo;
 
-    if(RegisterHotKey(NULL, 1, MOD_CONTROL | MOD_SHIFT | 0x4000, VK_SPACE)){
+    if(RegisterHotKey(NULL, 1, MOD_CONTROL | MOD_ALT | 0x4000, VK_SPACE)){
         cout << "Antes de tudo, para registrar adequadamente, nao feche o programa antes de finalizar\n";
         cout << "Agora me informe certinho:\n";
         cout << "O nome do anime (sem espacos!): ";
@@ -132,7 +142,7 @@ void prepararRegistro(){
         /// Aguardar input do teclado
         system("cls");
         cout << "Eu estou pronto para comecar!\n";
-        cout << "Aperte CTRL + SHIFT + ESPACO quando comecar a assistir\n";
+        cout << "Aperte CTRL + ALT + ESPACO quando comecar a assistir\n";
         cout << "Nao se esqueca, eu rodo no fundo!\n";
         aguardarInicio();
 
@@ -146,8 +156,12 @@ void prepararRegistro(){
         cout << "Pressione ENTER para finalizar\n";
         getch();
     }else{
+        DWORD errorMessageID = ::GetLastError();
+
         cout << "Houve algum erro ao inicializar!\n";
         cout << "Aperte enter para retomar ao menu\n";
+        cout << "Codigo de erro: " + errorMessageID;
+        
         getch();
     }
 
